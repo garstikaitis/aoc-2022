@@ -1,6 +1,9 @@
 const text = await Deno.readTextFile("./input.txt");
 const elfs = text.split(/\r?\n/);
-const elfDict = {};
+type ElfDictionary = {
+  [key: number]: number;
+};
+const elfDict: ElfDictionary = {};
 let currentIndex = 0;
 for (let i = 0; i < elfs.length; i++) {
   const cal = elfs[i];
@@ -26,4 +29,4 @@ const result = sorted.reduce((acc, curr) => {
   return acc + curr;
 }, 0);
 
-export result;
+export default result;
