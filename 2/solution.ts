@@ -1,30 +1,43 @@
 const text = await Deno.readTextFile("./input.txt");
 const games = text.split(" ").join().split("\n");
 
-type MyChoiceOptions = "X" | "Y" | "Z";
+type OutcomeOptions = "X" | "Y" | "Z";
 
-type MyChoice = {
-  X: number;
-  Y: number;
-  Z: number;
+type OpponentChoice = {
+  A: number;
+  B: number;
+  C: number;
 };
 
 type OpponentChoiceOptions = "A" | "B" | "C";
 
-// MY CHOICE
-// X = rock - 1
-// Y = paper - 2
-// Z = scissors - 3
-const myChoiceMap: MyChoice = {
-  X: 1,
-  Y: 2,
-  Z: 3,
+// Outcomes
+// X = Lose
+// Y = Draw
+// Z = Win
+
+const opponentChoiceMap: OpponentChoice = {
+  A: 1,
+  B: 2,
+  C: 3,
 };
 
-const myChoiceToOpponentChoice = {
-  X: "A",
-  Y: "B",
-  Z: "C",
+const outcomeChoiceMap = {
+  X: {
+    A: "C",
+    B: "A",
+    C: "B",
+  },
+  Y: {
+    A: "A",
+    B: "B",
+    C: "C",
+  },
+  Z: {
+    A: "B",
+    B: "C",
+    C: "A",
+  },
 };
 
 // OPPONENT CHOICE
@@ -32,44 +45,21 @@ const myChoiceToOpponentChoice = {
 // B = paper
 // C = scissors
 
-function getMyScore(choice: MyChoiceOptions): number {
-  return myChoiceMap[choice];
-}
-
-function checkIfMyChoiceWon(
-  opponentChoice: OpponentChoiceOptions,
-  myChoice: MyChoiceOptions
-): boolean {
-  const converted = convertMyChoiceToOpponentChoice(myChoice);
-  if (converted === "A" && opponentChoice === "C") return true;
-  if (converted === "B" && opponentChoice === "A") return true;
-  if (converted === "C" && opponentChoice === "B") return true;
-  return false;
-}
-
-function checkIfMyChoiceDraw(
-  opponentChoice: OpponentChoiceOptions,
-  myChoice: MyChoiceOptions
-): boolean {
-  const converted = convertMyChoiceToOpponentChoice(myChoice);
-  return converted === opponentChoice;
-}
-
-function getWinningScore(
-  opponentChoice: OpponentChoiceOptions,
-  myChoice: MyChoiceOptions
-): number {
-  const isWinningCondition = checkIfMyChoiceWon(opponentChoice, myChoice);
-  if (isWinningCondition) return 6;
-  const isDrawCondition = checkIfMyChoiceDraw(opponentChoice, myChoice);
-  if (isDrawCondition) return 3;
-  return 0;
-}
-
-function convertMyChoiceToOpponentChoice(
-  myChoice: MyChoiceOptions
+function getMyChoiceBasedOnOpponentChoiceAndOutcome(
+  choice: OpponentChoiceOptions,
+  outcome: OutcomeOptions
 ): OpponentChoiceOptions {
-  return myChoiceToOpponentChoice[myChoice] as OpponentChoiceOptions;
+  return outcomeChoiceMap[outcome][choice] as OpponentChoiceOptions;
+}
+
+function getMyChoiceScore(choice: OpponentChoiceOptions): number {
+  return opponentChoiceMap[choice];
+}
+
+function getOutcomeScore(outcome: OutcomeOptions) {
+  if (outcome === "X") return 0;
+  if (outcome === "Y") return 3;
+  return 6;
 }
 
 let result = 0;
@@ -77,10 +67,14 @@ games.forEach(game => {
   const opponentChoice: OpponentChoiceOptions = game.split(
     ","
   )[0] as OpponentChoiceOptions;
-  const myChoice: MyChoiceOptions = game.split(",")[1] as MyChoiceOptions;
-  const myScore = getMyScore(myChoice);
-  const winningScore = getWinningScore(opponentChoice, myChoice);
-  result += myScore + winningScore;
+  const outcome = game.split(",")[1] as OutcomeOptions;
+  const myChoice = getMyChoiceBasedOnOpponentChoiceAndOutcome(
+    opponentChoice,
+    outcome
+  );
+  const myChoiceScore = getMyChoiceScore(myChoice);
+  const outcomeScore = getOutcomeScore(outcome);
+  result += myChoiceScore + outcomeScore;
 });
 console.log(result);
 export default result;
