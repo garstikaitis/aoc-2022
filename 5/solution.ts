@@ -22,9 +22,7 @@ function getItemsToMove(amount: number, from: MovablePositions): string[] {
 }
 
 function addItemsToStack(items: string[], to: MovablePositions): void {
-  items.forEach(item => {
-    stack[to].unshift(item);
-  });
+  stack[to] = [...items, ...stack[to]];
 }
 
 function removeItemsFromStack(items: string[], from: MovablePositions): void {
